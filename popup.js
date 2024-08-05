@@ -1,11 +1,21 @@
-document.addEventListener('DOMContentLoaded', function() {
-  // Fetch the number of blocked requests from declarativeNetRequest (not directly supported yet)
-  // This is a placeholder for the actual blocked count logic
-  document.getElementById('blockedCount').textContent = "N/A";
+document.addEventListener('DOMContentLoaded', () => {
+  const blockedAdsCountElem = document.getElementById('blockedAdsCount');
+  const toggleButton = document.getElementById('toggleButton');
 
-  document.getElementById('refreshButton').addEventListener('click', function() {
-    chrome.runtime.sendMessage({ action: "refreshAdBlockList" }, function(response) {
-      console.log('Ad block list refreshed:', response.status);
+  let adBlockEnabled = true;
+
+  chrome.runtime.sendMessage({ action: 'getBlockedAdsCount' }, (response) => {
+    blockedAdsCountElem.textContent = response.blockedAdsCount;
+  });
+
+  toggleButton.addEventListener('click', () => {
+    chrome.runtime.sendMessage({ action: 'toggleAdBlock' }, (response) => {
+      adBlockEnabled = response.adBlockEnabled;
+      updateToggleButton();
     });
   });
+
+  function updateToggleButton() {
+    toggleButton.textContent = adBlockEnabled ? 'Turn Off' : 'Turn On';
+  }
 });
